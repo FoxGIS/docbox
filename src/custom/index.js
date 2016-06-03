@@ -5,8 +5,8 @@
  * media queries.
  */
 module.exports.brandNames = {
-  desktop: 'Wobble API Documentation',
-  tablet: 'Wobble API Docs',
+  desktop: 'FoxGIS API Documentation',
+  tablet: 'FoxGIS API Docs',
   mobile: 'API Docs'
 };
 
@@ -19,7 +19,7 @@ module.exports.brandClasses = 'fill-red';
 /**
  * Text for the link back to the linking website.
  */
-module.exports.backLink = 'Back to wobbles.com';
+module.exports.backLink = 'foxgis.com';
 
 /**
  * Runs after highlighting code samples. You can use this
