@@ -1167,3 +1167,31 @@ search | 搜索的关键字，多个关键字用`+`隔开，例如：`search=北
 limit | 返回结果的最大数目
 skip | 跳过前面多少个查询结果
 sort | 设置排序字段，降序在字端前加`-`,例如：`sort=-updatedAt`
+
+
+## 统计信息
+
+### 获取上传文件的统计信息
+
+```endpoint
+GET /stats/uploads
+```
+
+#### 响应成功
+```json
+[{
+  "total": 11,
+  "owner": "jingsam",
+  "name": "张三",
+  "location": "武汉",
+  "organization": "FoxGIS"
+},{
+  "total": 5,
+  "owner": "nick",
+  "name": "李四",
+  "location": "北京",
+  "organization": "WHU"
+}]
+```
+
+

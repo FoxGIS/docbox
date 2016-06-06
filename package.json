@@ -8,7 +8,7 @@
     "test": "npm run test-unit && eslint src && npm run prerender -- /dev/null && rm -rf lib",
     "test-unit": "mocha --compilers js:babel-register test",
     "prerender": "babel src --out-dir lib && node lib/render.js",
-    "build": "browserify src/index.js | uglifyjs -c -m > bundle.js && npm run prerender -- index.html"
+    "build": "cross-env NODE_ENV=production browserify src/index.js | uglifyjs -c -m > bundle.js && npm run prerender -- index.html"
   },
   "browserify": {
     "transform": [
@@ -53,10 +53,11 @@
   },
   "devDependencies": {
     "babel-register": "^6.3.13",
+    "budo": "^8.2.2",
+    "cross-env": "^1.0.8",
     "expect": "^1.13.4",
     "mocha": "^2.3.4",
     "to-vfile": "^1.0.0",
-    "budo": "^8.2.2",
     "uglifyjs": "^2.4.10"
   }
 }

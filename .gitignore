@@ -37,6 +37,5 @@ public/uploads/*
 # Config file
 
 index.html
-bundle.js
 lib/
 
