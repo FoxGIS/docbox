@@ -19,12 +19,24 @@ header方式 | headers['x-access-token'] = {your_access_token}
 
 ## 用户模块
 
-用户有`username` `access_token` `scope` `is_verified` `name` `email` `phone` `location` `organization` `createdAt` `updatedAt`等字段。其中`access_token`只在用户注册和登录的时候返回。
+字段 | 含义
+---|---
+username | 用户名
+access_token | 访问令牌，只在用户注册和登录的时候返回
+scope | 用户信息访问范围，可以是`private`或`public`
+is_verified | 是否经过了认证
+name | 姓名
+location | 用户所在地区
+organization | 单位
+position | 职务/职称
+telephone | 固定电话
+mobile | 手机号码
+email | 电子邮箱
 
 
 ### 用户注册
 
-用户注册不需要提供`access_token`。用户注册时必须填写`username` `password`,可以选择性地完善自己的`name` `email` `phone` `location` `organization`信息。
+用户注册不需要提供`access_token`。用户注册时必须填写`username` `password`,可以选择性地完善自己的`name` `email` `telephone` `location` `organization`等信息。
 
 ```endpoint
 POST /users
@@ -37,7 +49,7 @@ POST /users
   "password": "123456",
   "name": "jingsam",
   "email": "jingsam@gmail.com",
-  "phone": 123456789,
+  "telephone": 123456789,
   "location": "beijing",
   "organization": "foxgis"
 }
@@ -52,7 +64,7 @@ POST /users
   "is_verified": false,
   "name": "jingsam",
   "email": "jingsam@gmail.com",
-  "phone": 123456789,
+  "telephone": 123456789,
   "location": "beijing",
   "organization": "foxgis",
   "updatedAt": "2016-05-06T12:33:02.689Z",
@@ -84,7 +96,7 @@ GET /users/{username}
   "is_verified": false,
   "name": "jingsam",
   "email": "jingsam@163.com",
-  "phone": "12345678",
+  "telephone": "12345678",
   "organization": "WHU",
   "createdAt": "2016-05-06T10:18:59.498Z",
   "updatedAt": "2016-05-06T11:37:35.551Z"
@@ -101,7 +113,7 @@ GET /users/{username}
 
 ### 更新用户信息
 
-只允许更新用户信息中的`name` `scope` `email`, `phone`, `location`, `organization`属性
+只允许更新用户信息中的`scope` `name` `location`, `organization`, `postition`, `telephone`，`mobile`，`phone`属性
 
 ```endpoint
 PATCH /users/{username}
@@ -123,7 +135,7 @@ PATCH /users/{username}
   "is_verified": false,
   "name": "张三",
   "email": "jingsam@163.com",
-  "phone": "12345678",
+  "telephone": "12345678",
   "organization": "WHU",
   "createdAt": "2016-05-06T10:18:59.498Z",
   "updatedAt": "2016-05-06T11:37:35.551Z"
@@ -162,7 +174,7 @@ POST /users/{username}
   "name": "张三",
   "access_token": "{your_access_token}",
   "email": "jingsam@163.com",
-  "phone": "12345678",
+  "telephone": "12345678",
   "organization": "WHU",
   "createdAt": "2016-05-06T10:18:59.498Z",
   "updatedAt": "2016-05-06T11:37:35.551Z"
@@ -698,7 +710,21 @@ HTTP 204
 
 ## 字体模块
 
-字体有`owner` `fontname` `scope` `createdAt` `updatedAt`等字段。
+制图模块管理用户上传的字体。
+
+字段信息：
+字段 | 说明
+--- | ---
+fontname | 字体名称
+owner | 所有者
+scope | 共享范围，可能的取值有`private`和`public`，默认为`public`
+family_name | 字族名称
+style_name | 字体样式，如`Regular`，`Bold`，`Italic`
+coverages | 字体语言覆盖率信息
+coverages.name | 语言名称，如`English`
+coverages.id | 语言名称简写，如`en`
+coverages.count | 字体在该语言中的覆盖的字符数
+coverages.total | 该语言的中字符数
 
 
 ### 获取用户字体列表
@@ -709,29 +735,41 @@ GET /fonts/{username}
 #### 响应成功
 ```json
 [{
-  "updatedAt": "2016-05-23T05:51:34.710Z",
-  "createdAt": "2016-05-23T05:51:33.199Z",
-  "fontname": "宋体",
+  "fontname": "STKaiti Regular",
   "owner": "jingsam",
-  "scope": "public"
+  "updatedAt": "2016-06-19T06:17:10.795Z",
+  "style_name": "Regular",
+  "family_name": "STKaiti",
+  "createdAt": "2016-06-19T06:17:10.795Z",
+  "coverages": [{
+      "total": 45,
+      "count": 0,
+      "id": "ar",
+      "name": "Arabic"
+  }]
 },{
-  "updatedAt": "2016-05-23T05:51:34.710Z",
-  "createdAt": "2016-05-23T05:51:33.199Z",
-  "fontname": "楷体",
+  "fontname": "Open Sans Regular",
   "owner": "jingsam",
-  "scope": "public"
+  "updatedAt": "2016-06-19T06:17:10.795Z",
+  "style_name": "Regular",
+  "family_name": "STKaiti",
+  "createdAt": "2016-06-19T06:17:10.795Z",
+  "coverages": [{
+      "total": 45,
+      "count": 0,
+      "id": "ar",
+      "name": "Arabic"
+  }]
 }]
 ```
 
 #### 响应失败
 ```json
-{
-  "errors": "内部错误"
-}
+HTTP 500
 ```
 
 
-### 获取上传字体状态
+### 获取字体信息
 ```endpoint
 GET /fonts/{username}/{fontname}
 ```
@@ -739,11 +777,28 @@ GET /fonts/{username}/{fontname}
 #### 响应成功
 ```json
 {
-  "updatedAt": "2016-05-23T05:51:34.710Z",
-  "createdAt": "2016-05-23T05:51:33.199Z",
-  "fontname": "宋体",
+  "fontname": "STKaiti Regular",
   "owner": "jingsam",
-  "scope": "public"
+  "updatedAt": "2016-06-19T06:17:10.795Z",
+  "style_name": "Regular",
+  "family_name": "STKaiti",
+  "createdAt": "2016-06-19T06:17:10.795Z",
+  "coverages": [{
+    "total": 45,
+    "count": 0,
+    "id": "ar",
+    "name": "Arabic"
+  }, {
+    "total": 37,
+    "count": 37,
+    "id": "ca",
+    "name": "Catalan"
+  }, {
+    "total": 42,
+    "count": 42,
+    "id": "cs",
+    "name": "Czech"
+  }]
 }
 ```
 
@@ -766,28 +821,33 @@ POST /fonts/{username}
 #### 响应成功
 ```json
 {
-  "updatedAt": "2016-05-23T05:51:34.710Z",
-  "createdAt": "2016-05-23T05:51:33.199Z",
-  "fontname": "宋体",
+  "fontname": "STKaiti Regular",
   "owner": "jingsam",
-  "scope": "public"
+  "updatedAt": "2016-06-19T06:17:10.795Z",
+  "style_name": "Regular",
+  "family_name": "STKaiti",
+  "createdAt": "2016-06-19T06:17:10.795Z",
+  "coverages": [{
+      "total": 45,
+      "count": 0,
+      "id": "ar",
+      "name": "Arabic"
+  }]
 }
 ```
 
 #### 响应失败
 ```json
-{
-  "errors": "内部错误"
-}
+HTTP 500
 ```
 
 
-### 修改字体状态
+### 更新字体信息
 
-只允许修改`scope`字段
+允许修改字段有`scope`。
 
 ```endpoint
-PATCH /fonts/{username}
+PATCH /fonts/{username}/{fontname}
 ```
 
 #### 请求示例
@@ -800,11 +860,19 @@ PATCH /fonts/{username}
 #### 响应成功
 ```json
 {
-  "updatedAt": "2016-05-23T05:51:34.710Z",
-  "createdAt": "2016-05-23T05:51:33.199Z",
-  "fontname": "宋体",
+  "fontname": "STKaiti Regular",
   "owner": "jingsam",
-  "scope": "private"
+  "scope": "private",
+  "updatedAt": "2016-06-19T06:17:10.795Z",
+  "style_name": "Regular",
+  "family_name": "STKaiti",
+  "createdAt": "2016-06-19T06:17:10.795Z",
+  "coverages": [{
+      "total": 45,
+      "count": 0,
+      "id": "ar",
+      "name": "Arabic"
+  }]
 }
 ```
 
@@ -815,11 +883,6 @@ PATCH /fonts/{username}
 }
 ```
 
-
-### 获取字体
-```endpoint
-GET /fonts/{username}/{fontname}/{range}.pbf
-```
 
 ### 删除字体
 ```endpoint
@@ -832,9 +895,66 @@ HTTP 204
 ```
 
 
+### 获取字形
+
+根据支付码点范围，获取转换后的pbf格式的字形文件
+
+```endpoint
+GET /fonts/{username}/{fontname}/{start}-{end}.pbf
+```
+
+参数 | 说明
+start | 字形码点的起点，取值为256的倍数，范围为[0, 65280]
+end | 字形码点的终点，取值为`start` + 255
+
+#### 响应成功
+```json
+HTTP 200
+```
+
+
+### 下载字体源文件
+
+下载字体源文件，如`ttf`或`otf`字体文件
+
+```endpoint
+GET /fonts/{username}/{fontname}/raw
+```
+
+#### 响应成功
+```json
+HTTP 200
+```
+
+
+### 字体预览
+
+获取字体预览，格式为`png`
+
+```endpoint
+GET /fonts/{username}/{fontname}/thumbnail
+```
+
+#### 响应成功
+```json
+HTTP 200
+```
+
+
+
 ## 符号库模块
 
-符号库有`owner` `sprite_id` `scope` `name` `createdAt` `updatedAt`等描述性字段。
+符号库模块管理用户上传的符号库
+
+字段信息：
+字段 | 说明
+--- | ---
+sprite_id | 符号库id
+owner | 所有者
+scope | 共享范围，可能的取值有`private`和`public`，默认为`public`
+name | 符号库名称
+createdAt | 符号库创建时间
+updatedAt | 符号库更新时间
 
 
 ### 获取符号库列表
@@ -869,7 +989,7 @@ GET /sprites/{username}
 ```
 
 
-### 查看符号库状态
+### 获取符号库信息
 ```endpoint
 GET /sprites/{username}/{sprite_id}
 ```
@@ -922,18 +1042,30 @@ POST /sprites/{username}
 ```
 
 
-### 下载符号库
+### 添加图标
 
-获取符号库时，`scale`可以指定为`@1x`或者`@2x`;`format`缺省时默认为`.json`,也可指定为`.json`或`.png`。
+为符号库添加一个图标，上传的图标格式为`svg`。注意，如果上传的图标文件与符号库的图标同名，将会覆盖符号库中的图标。
 
 ```endpoint
-GET /sprites/{username}/{sprite_id}/sprite:scale(@[2]x)?.:format([\\w\\.]+)?
+POST /sprites/{username}/{sprite_id}
+```
+
+#### 相应成功
+```json
+HTTP 204
+```
+
+#### 响应失败
+```json
+{
+  "error": "仅支持svg格式的图标"
+}
 ```
 
 
-### 更新符号库
+### 更新符号库信息
 
-只允许更新`name` `scope`字段
+允许更新的字段有`name`，`scope`。
 
 ```endpoint
 PATCH /sprites/{username}/{sprite_id}
@@ -959,17 +1091,10 @@ PATCH /sprites/{username}/{sprite_id}
 }
 ```
 
-#### 响应失败
-```json
-{
-  "errors": "更新不存在的符号库"
-}
-```
-
 
 ### 删除符号库
 ```endpoint
-DELETE /sprites/{username}/{style_id}
+DELETE /sprites/{username}/{sprite_id}
 ```
 
 #### 响应成功
@@ -977,15 +1102,148 @@ DELETE /sprites/{username}/{style_id}
 HTTP 204
 ```
 
+#### 响应失败
+```json
+HTTP 404
+```
 
-## 文件上传模块
+### 删除图标
 
-文件上传有`owner` `upload_id` `tags` `scope` `name` `year` `location` `description` `size` `format` `updatedAt` `createdAt` `thumbnail` `mini_thumbnail`等字段，其中`thumbnail`用来储存上传图片文件的概览图，只在预览时用到。`mini_thumbnail`用来储存上传图片文件的微缩图,只在获取微缩图时用到
+删除符号库中的一个图标
 
-
-### 获取上传文件列表
 ```endpoint
-GET /uploads/{username}
+DELETE /sprites/{username}/{sprite_id}/{icon}
+```
+
+#### 响应成功
+```json
+HTTP 204
+```
+
+#### 响应失败
+```json
+HTTP 404
+```
+
+
+### 获取符号库
+
+```endpoint
+GET /sprites/{username}/{sprite_id}/sprite@{scale}x.{format}
+```
+
+参数 | 说明
+--- | ---
+scale | 分辨率级别，取值范围为[1, 4]，默认为1
+format | 文件格式，可能的取值为`json`和`png`，默认为`json`
+
+#### 响应成功
+```json
+{
+  "us-highway-alternate-3": {
+    "width": 26,
+    "height": 38,
+    "x": 0,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "us-highway-business-2": {
+    "width": 20,
+    "height": 38,
+    "x": 26,
+    "y": 0,
+    "pixelRatio": 1
+  }
+}
+```
+
+#### 响应失败
+```json
+HTTP 404
+```
+
+
+### 打包符号库
+
+包括符号库中的`svg`文件并下载。
+
+```endpoint
+GET /sprites/{username}/{sprite_id}/raw
+```
+
+
+### 下载图标
+
+下载符号库中的一个`svg`图标。
+
+```endpoint
+GET /sprites/{username}/{sprite_id}/{icon}
+```
+
+
+
+## 文件模块
+
+文件模块用于管理用户上传的文件，上传的文件大小限制在`200M`。如果上传的文件为图片，还可获取缩略图。
+
+字段信息：
+字段 | 说明
+---|---
+file_id | 文件id
+owner | 文件所有者
+scope | 共享范围，可能的取值为`private`和`public`，默认为`private`
+name | 文件名
+year | 制图时间
+location | 制图地区
+tags | 标签
+description | 描述信息
+scale | 比例尺
+dimensions | 图幅的长度和宽度，单位为毫米
+format | 文件格式
+size | 文件大小，单位为字节数
+createdAt | 文件上传时间
+updatedAt | 文件信息更新时间
+
+
+### 获取文件统计信息
+
+统计系统中各地区总共上传了多少文件
+
+```endpoint
+GET /files/stats
+```
+
+#### 响应成功
+```json
+[{
+  "total": 11,
+  "location": "湖北"
+},{
+  "total": 5,
+  "location": "北京"
+}]
+```
+
+
+### 搜索文件
+
+搜索公开分享的文件
+
+```endpoint
+GET /files/search?keywords={keyword1}+{keyword2}&limit=10&skip=20&sort=-createdAt
+```
+
+查询参数 | 说明
+---|---
+keywords | 搜索的关键字，多个关键字用`+`隔开，例如：`search=北京+上海`
+limit | 返回结果的最大数目
+skip | 跳过前面多少个查询结果，默认值为0
+sort | 设置排序字段，降序在字端前加`-`,例如：`sort=-createdAt`
+
+
+### 获取文件列表
+```endpoint
+GET /files/{username}
 ```
 
 #### 响应成功
@@ -999,7 +1257,7 @@ GET /uploads/{username}
     "owner": "jingsam",
     "tags": ["china", "2016"],
     "description": "a big file",
-    "upload_id": "BJ7Sgvd-"
+    "file_id": "BJ7Sgvd-"
 },{
     "updatedAt": "2016-05-05T11:44:56.201Z",
     "createdAt": "2016-05-05T09:00:56.101Z",
@@ -1009,21 +1267,19 @@ GET /uploads/{username}
     "owner": "jingsam",
     "tags": ["beijing", "2015"],
     "description": "a bigger file",
-    "upload_id": "SygXI5OZ"
+    "file_id": "SygXI5OZ"
 }]
 ```
 
 #### 响应失败
 ```json
-{
-  "error": "内部错误"
-}
+HTTP 500
 ```
 
 
-### 获取文件状态
+### 获取文件信息
 ```endpoint
-GET /uploads/{username}/{upload_id}
+GET /files/{username}/{file_id}
 ```
 
 #### 响应成功
@@ -1037,7 +1293,7 @@ GET /uploads/{username}/{upload_id}
   "owner": "jingsam",
   "tags": ["china", "2016"],
   "description": "a big file",
-  "upload_id": "SygXI5OZ"
+  "file_id": "SygXI5OZ"
 }
 ```
 
@@ -1049,12 +1305,39 @@ GET /uploads/{username}/{upload_id}
 ```
 
 
-### 更新文件状态
+### 上传文件
+
+一次只允许上传一个文件，且文件大小要小于200M。
+
 ```endpoint
-PATCH /uploads/{username}/{upload_id}
+POST /files/{username}
 ```
 
-只能更新`tags` `name` `description` `scope` `year` `location`字段
+#### 响应成功
+```json
+{
+  "updatedAt": "2016-05-05T10:44:56.201Z",
+  "createdAt": "2016-05-05T09:44:56.101Z",
+  "name": "china",
+  "format": "png",
+  "size": 99410,
+  "owner": "jingsam",
+  "upload_id": "BJ7Sgvd-"
+}
+```
+
+#### 响应失败
+```json
+HTTP 500
+```
+
+
+### 更新文件信息
+```endpoint
+PATCH /files/{username}/{file_id}
+```
+
+可更新的字段有`scope`，`name`，`year`，`location`，`tags`，`description`，`scale`，`dimensions`。
 
 #### 请求示例
 ```json
@@ -1075,7 +1358,8 @@ PATCH /uploads/{username}/{upload_id}
   "size": 99410,
   "owner": "jingsam",
   "tags": ["new"],
-  "description": "a new file"
+  "description": "a new file",
+  "file_id": "SygXI5OZ"
 }
 ```
 
@@ -1087,15 +1371,9 @@ PATCH /uploads/{username}/{upload_id}
 ```
 
 
-### 下载文件
-```endpoint
-GET /uploads/{username}/{upload_id}/file
-```
-
-
 ### 删除文件
 ```endpoint
-DELETE /uploads/{username}/{upload_id}
+DELETE /files/{username}/{file_id}
 ```
 
 #### 响应成功
@@ -1103,95 +1381,26 @@ DELETE /uploads/{username}/{upload_id}
 HTTP 204
 ```
 
-
-### 上传文件
-
-一次只允许上传一个文件，且文件大小要小于 200M。当上传格式为`jpg` `jpeg` `png`
-`tif` `tiff`的图片时，会生成`png`格式的缩略图并保存。
-
-```endpoint
-POST /uploads/{username}
-```
-
-#### 响应成功
-```json
-{
-  "updatedAt": "2016-05-05T10:44:56.201Z",
-  "createdAt": "2016-05-05T09:44:56.101Z",
-  "name": "china",
-  "format": "png",
-  "size": 99410,
-  "owner": "jingsam",
-  "upload_id": "BJ7Sgvd-"
-}
-```
-
 #### 响应失败
 ```json
-{
-  "error": "内部错误"
-}
+HTTP 404
+```
+
+
+### 下载文件
+```endpoint
+GET /files/{username}/{file_id}/raw
 ```
 
 
 ### 获取概览图
 
-上传图片的宽度大于1000像素时，其缩略图宽度为1000像素。
-上传图片的宽度小于1000像素时，缩略图大小等于原图。
-
 ```endpoint
-GET /uploads/{username}/{upload_id}/thumbnail
-```
-
-
-### 获取微缩图
-
-返回原图300*300大小的微缩图
-
-```endpoint
-GET /uploads/{username}/{upload_id}/mini_thumbnail
-```
-
-
-### 搜索文件
-
-搜索公开分享的上传文件
-
-```endpoint
-GET /uploads?search={keyword1}+{keyword2}
+GET /files/{username}/{file_id}/thumbnail?width=300&height=400&quality=50
 ```
 
 查询参数 | 说明
 ---|---
-search | 搜索的关键字，多个关键字用`+`隔开，例如：`search=北京+上海`
-limit | 返回结果的最大数目
-skip | 跳过前面多少个查询结果
-sort | 设置排序字段，降序在字端前加`-`,例如：`sort=-updatedAt`
-
-
-## 统计信息
-
-### 获取上传文件的统计信息
-
-```endpoint
-GET /stats/uploads
-```
-
-#### 响应成功
-```json
-[{
-  "total": 11,
-  "owner": "jingsam",
-  "name": "张三",
-  "location": "武汉",
-  "organization": "FoxGIS"
-},{
-  "total": 5,
-  "owner": "nick",
-  "name": "李四",
-  "location": "北京",
-  "organization": "WHU"
-}]
-```
-
-
+width | 缩略图的宽度，单位为像素，当width和height同时未设置时，width取默认值1000
+height | 缩略图的高度，单位为像素
+quality | 缩略图的质量，取值范围为[0, 100]，默认为100
