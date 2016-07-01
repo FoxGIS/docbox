@@ -12,14 +12,14 @@ http://foxgis.com/api/v1
 
 方式 | 示例
 ---|---
-url方式(不推荐) | GET /{endpoint}?access_token={your_access_token}
+url方式 | GET /{endpoint}?access_token={your_access_token}
 cookie方式 | cookies["access_token"] = {your_access_token}
 header方式 | headers['x-access-token'] = {your_access_token}
 
 
 ## 用户模块
 
-字段 | 含义
+字段 | 说明
 ---|---
 username | 用户名
 access_token | 访问令牌，只在用户注册和登录的时候返回
@@ -32,11 +32,13 @@ position | 职务/职称
 telephone | 固定电话
 mobile | 手机号码
 email | 电子邮箱
+createdAt | 用户创建时间
+updatedAt | 用户信息更新时间
 
 
 ### 用户注册
 
-用户注册不需要提供`access_token`。用户注册时必须填写`username` `password`,可以选择性地完善自己的`name` `email` `telephone` `location` `organization`等信息。
+用户注册不需要提供`access_token`。用户注册时必须填写`username`、`password`,可以选择性地完善自己的`name`、`location`、`organization`、`position`、`telephone`、`mobile`、`email`信息。
 
 ```endpoint
 POST /users
@@ -82,7 +84,7 @@ POST /users
 
 ### 获取用户信息
 
-获取用户信息不能得到`access_token`
+获取用户信息不会得到`access_token`
 
 ```endpoint
 GET /users/{username}
@@ -113,7 +115,7 @@ GET /users/{username}
 
 ### 更新用户信息
 
-只允许更新用户信息中的`scope` `name` `location`, `organization`, `postition`, `telephone`，`mobile`，`phone`属性
+只允许更新用户信息中的`scope`、`name`、`location`、`organization`、`postition`、`telephone`、`mobile`、`email`属性
 
 ```endpoint
 PATCH /users/{username}
@@ -152,7 +154,7 @@ PATCH /users/{username}
 
 ### 用户登录
 
-用户登录不需要`access_token`，但登录成功后会生成新的`access_token`，已有的`access_token`会失效。
+用户登录不需要`access_token`，但登录成功后会生成新的`access_token`。
 
 ```endpoint
 POST /users/{username}
@@ -189,48 +191,32 @@ POST /users/{username}
 ```
 
 
-## 样式模块
+## 地图样式模块
 
-样式有`owner` `style_id` `scope` `tags` `version` `name` `metadata` `center` `zoom`   `bearing` `pitch` `sources` `sprite` `glyphs` `transition` `layers` `updatedAt`       `createdAt`等字段，其中`owner` `style_id` `scope` `tags` `version` `name` `updatedAt`  `createdAt`为样式文件描述字段。
+管理地图样式，地图样式遵循Mapbox GL JS Spec。
 
-
-### 搜索公开样式
-
-搜索全局的公开样式。在`url`中用`query`指定搜索关键字与`page`,每次搜索返回20条结果。
-
-```endpoint
-GET /styles
-```
-
-#### 响应成功
-```json
-[{
-    "updatedAt": "2016-05-05T11:06:22.957Z",
-    "createdAt": "2016-05-05T10:06:22.957Z",
-    "owner": "jingsam",
-    "name": "Basic",
-    "scope": "public",
-    "tags": ["public"],
-    "version": 8,
-    "style_id": "BywXo5O-"
-},{
-    "updatedAt": "2016-05-05T11:06:00.957Z",
-    "createdAt": "2016-05-05T10:06:00.957Z",
-    "owner": "jingsam",
-    "name": "Empty",
-    "scope": "public",
-    "tags": ["public"],
-    "version": 8,
-    "style_id": "SygXI5OZ"
-}]
-```
-
-#### 响应失败
-```json
-{
-  "errors": "内部错误"
-}
-```
+字段信息：
+字段 | 说明
+---|---
+style_id | 地图样式ID
+owner | 所有者
+scope | 共享范围，可能的取值有`private`和`public`，默认为`public`
+tags | 标签
+description | 描述信息
+version | 版本
+name | 名称
+metadata | 元数据信息
+center | 中心点，[lnt, lat]
+zoom | 缩放级别
+bearing | 方位角
+pitch | 倾斜度
+sources | 数据来源
+sprite | 符号库
+glyphs | 字体库
+transition | 渐变
+layers | 图层信息
+createdAt | 样式创建时间
+updatedAt | 样式更新时间
 
 
 ### 获取样式列表
@@ -263,13 +249,54 @@ GET /styles/{username}
 
 #### 响应失败
 ```json
+HTTP 500
+```
+
+
+### 获取某个样式
+```endpoint
+GET /styles/{username}/{style_id}
+```
+
+#### 响应成功
+```json
 {
-  "errors": "内部错误"
+  "updatedAt": "2016-05-05T10:06:22.957Z",
+  "createdAt": "2016-05-05T10:06:22.957Z",
+  "owner": "jingsam",
+  "name": "Basic",
+  "scope": "private",
+  "metadata": {
+    "mapbox:autocomposite": true
+  },
+  "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+  "sources": {},
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "rgba(0,0,0,0)"
+      }
+    }
+  ],
+  "pitch": 0,
+  "bearing": 0,
+  "center": [],
+  "version": 8,
+  "draft": true,
+  "style_id": "BywXo5O-"
 }
+```
+
+#### 响应失败
+```json
+HTTP 404
 ```
 
 
 ### 新建样式
+
 ```endpoint
 POST /styles/{username}
 ```
@@ -322,7 +349,6 @@ POST /styles/{username}
   "bearing": 0,
   "center": [],
   "version": 8,
-  "draft": true,
   "style_id": "BywXo5O-"
 }
 ```
@@ -335,56 +361,13 @@ POST /styles/{username}
 ```
 
 
-### 获取某个样式
-```endpoint
-GET /styles/{username}/{style_id}
-```
-
-#### 响应成功
-```json
-{
-  "updatedAt": "2016-05-05T10:06:22.957Z",
-  "createdAt": "2016-05-05T10:06:22.957Z",
-  "owner": "jingsam",
-  "name": "Basic",
-  "scope": "private",
-  "metadata": {
-    "mapbox:autocomposite": true
-  },
-  "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-  "sources": {},
-  "layers": [
-    {
-      "id": "background",
-      "type": "background",
-      "paint": {
-        "background-color": "rgba(0,0,0,0)"
-      }
-    }
-  ],
-  "pitch": 0,
-  "bearing": 0,
-  "center": [],
-  "version": 8,
-  "draft": true,
-  "style_id": "BywXo5O-"
-}
-```
-
-#### 响应失败
-```json
-{
-  "errors": "样式不存在"
-}
-```
-
-
 ### 更新某个样式
+
+字段除`style_id`、`owner`、`createdAt`、`updatedAt`都可更新
+
 ```endpoint
 PATCH /styles/{username}/{style_id}
 ```
-
-不允许更新`style_id` `owner` `createdAt` `updatedAt`字段
 
 #### 请求示例
 ```json
@@ -434,9 +417,7 @@ PATCH /styles/{username}/{style_id}
 
 #### 响应失败
 ```json
-{
-  "errors": "更新不存在的样式"
-}
+HTTP 404
 ```
 
 
@@ -451,53 +432,40 @@ HTTP 204
 ```
 
 
-## 瓦片集模块
+### 获取地图瓦片数据
 
-瓦片集有`owner` `tileset_id` `scope` `tags` `createdAt` `updatedAt`以及`name` `description` `version` `tilejson` `attribution` `template` `legend` `formatter` `scheme` `tiles` `grids` `data` `minzoom` `maxzoom` `resolution` `bounds` `center` `filesize` `format` `vector_layers` 等字段。
-
-
-### 搜索公开的瓦片集
-
-搜索全局的公开瓦片集。在`url`中用`query`指定搜索关键字与`page`,每次搜索返回20条结果。
+获取地图样式中的瓦片数据
 
 ```endpoint
-GET /tilesets/{username}
+GET /styles/{username}/{style_id}/{z}/{x}/{y}{@2x}.{format}
 ```
 
-#### 响应成功
-```json
-[{
-  "updatedAt": "2016-05-23T05:51:34.710Z",
-  "createdAt": "2016-05-23T05:51:33.199Z",
-  "tags": ["public"],
-  "owner": "jingsam",
-  "filesize": 65794689024,
-  "description": "Extract from osm2vectortiles.org",
-  "format": "pbf",
-  "name": "Open Streets",
-  "attribution": "&copy; OpenStreetMap contributors",
-  "progress": 100,
-  "center": [ 116.3400305, 39.9589555, 10 ],
-  "bounds": [ 116.04142, 39.75872, 116.638641, 40.159191 ],
-  "maxzoom": 14,
-  "minzoom": 0,
-  "data": [],
-  "grids": [],
-  "tiles": [],
-  "scheme": "xyz",
-  "version": "1",
-  "tilejson": "2.1.0",
-  "scope": "public",
-  "tileset_id": "rJ6P9GlQ"
-}]
+
+### 获取地图预览
+
+获取设定范围的地图预览
+
+```endpoint
+GET /styles/{username}/{style_id}/thumbnail
 ```
 
-#### 响应失败
-```json
-{
-  "errors": "内部错误"
-}
-```
+
+## 瓦片集模块
+
+管理用户上传的制图数据
+
+字段信息：
+字段 | 说明
+--- | ---
+tileset_id | 瓦片集ID
+owner | 所有者
+scope | 共享范围，可能的取值有`private`和`public`，默认为`public`
+tags | 标签
+filename | 上传文件名
+filesize | 上传文件大小
+tilejson... | tilejson 相关字段，遵循Tilejson Spec标准
+createdAt | 瓦片集创建时间
+updatedAt | 瓦片集更新时间
 
 
 ### 获取瓦片集列表
@@ -558,13 +526,14 @@ GET /tilesets/{username}
 
 #### 响应失败
 ```json
-{
-  "errors": "内部错误"
-}
+HTTP 500
 ```
 
 
-### 获取某个瓦片集
+### 获取瓦片集信息
+
+获取瓦片集信息，以tilejson格式表达。
+
 ```endpoint
 GET /tilesets/{username}/{tileset_id}
 ```
@@ -599,18 +568,18 @@ GET /tilesets/{username}/{tileset_id}
 
 #### 响应失败
 ```json
-{
-  "errors": "瓦片集不存在"
-}
+HTTP 404
 ```
 
 
-### 上传瓦片集
+### 上传数据
+
+上传数据，系统根据上传的数据自动地转换为瓦片数据，支持的格式有`mbtiles`、`geojson`、`shapefile`。
+
 ```endpoint
 POST /tilesets/{username}
 ```
 
-支持`mbtiles` `geojson` `shapefile`形式瓦片集的上传
 
 #### 响应成功
 ```json
@@ -633,23 +602,22 @@ POST /tilesets/{username}
 
 #### 响应失败
 ```json
-{
-  "errors": "内部错误"
-}
+HTTP 500
 ```
 
 
-### 更新瓦片集
+### 更新瓦片集信息
+
+可更新的字段有`scope`、`tags`、`name`、`description`、`vector_layers`。
+
 ```endpoint
 PATCH /tilesets/{username}/{tileset_id}
 ```
 
-只允许更新`scope` `tags` `name` `description` `vector_layers`字段
-
 #### 请求示例
 ```json
 {
-  "tags": ["public"]
+  "scope": "public"
 }
 ```
 
@@ -658,7 +626,7 @@ PATCH /tilesets/{username}/{tileset_id}
 {
   "updatedAt": "2016-05-23T05:51:34.710Z",
   "createdAt": "2016-05-23T05:51:33.199Z",
-  "tags": ["public"],
+  "scope": "public",
   "owner": "jingsam",
   "filesize": 65794689024,
   "description": "Extract from osm2vectortiles.org",
@@ -683,18 +651,8 @@ PATCH /tilesets/{username}/{tileset_id}
 
 #### 响应失败
 ```json
-{
-  "errors": "要更新的瓦片集不存在"
-}
+HTTP 404
 ```
-
-
-### 获取瓦片
-```endpoint
-GET /tilesets/{username}/{tileset_id}/{z}/{x}/{y}{@2x}.{format}
-```
-
-`format`必须为`vector.pbf`
 
 
 ### 删除瓦片集
@@ -705,6 +663,33 @@ DELETE /tilesets/{username}/{tileset_id}
 #### 响应成功
 ```json
 HTTP 204
+```
+
+
+### 获取瓦片
+
+根据`z`、`x`、`y`获取单张瓦片
+
+```endpoint
+GET /tilesets/{username}/{tileset_id}/{z}/{x}/{y}{@2x}.{format}
+```
+
+
+### 下载源文件
+
+下载生成瓦片的原始数据
+
+```endpoint
+GET /tilesets/{username}/{tileset_id}/raw
+```
+
+
+### 瓦片集预览
+
+获取设定范围内的瓦片预览
+
+```endpoint
+GET /tilesets/{username}/{tileset_id}/thumbnail
 ```
 
 
@@ -1044,10 +1029,10 @@ POST /sprites/{username}
 
 ### 添加图标
 
-为符号库添加一个图标，上传的图标格式为`svg`。注意，如果上传的图标文件与符号库的图标同名，将会覆盖符号库中的图标。
+为符号库添加一个图标，上传的图标格式为`svg`。注意，如果图标在符号库中已存在，将会替换符号库中的图标。
 
 ```endpoint
-POST /sprites/{username}/{sprite_id}
+PUT /sprites/{username}/{sprite_id}/{icon}
 ```
 
 #### 相应成功
@@ -1199,8 +1184,8 @@ tags | 标签
 description | 描述信息
 scale | 比例尺
 dimensions | 图幅的长度和宽度，单位为毫米
-format | 文件格式
-size | 文件大小，单位为字节数
+filename | 上传文件的文件名
+filesize | 文件大小，单位为字节数
 createdAt | 文件上传时间
 updatedAt | 文件信息更新时间
 
