@@ -32,13 +32,14 @@ position | 职务/职称
 telephone | 固定电话
 mobile | 手机号码
 email | 电子邮箱
+signature | 个人签名
 createdAt | 用户创建时间
 updatedAt | 用户信息更新时间
 
 
 ### 用户注册
 
-用户注册不需要提供`access_token`。用户注册时必须填写`username`、`password`,可以选择性地完善自己的`name`、`location`、`organization`、`position`、`telephone`、`mobile`、`email`信息。
+用户注册不需要提供`access_token`。用户注册时必须填写`username`、`password`,可以选择性地完善自己的`name`、`location`、`organization`、`position`、`telephone`、`mobile`、`email`、`signature`信息。
 
 ```endpoint
 POST /users
@@ -82,76 +83,6 @@ POST /users
 ```
 
 
-### 获取用户信息
-
-获取用户信息不会得到`access_token`
-
-```endpoint
-GET /users/{username}
-```
-
-#### 响应成功
-```json
-{
-  "username": "jingsam",
-  "scope": "public",
-  "is_verified": false,
-  "name": "jingsam",
-  "email": "jingsam@163.com",
-  "telephone": "12345678",
-  "organization": "WHU",
-  "createdAt": "2016-05-06T10:18:59.498Z",
-  "updatedAt": "2016-05-06T11:37:35.551Z"
-}
-```
-
-#### 响应失败
-```json
-{
-  "error": "用户不存在"
-}
-```
-
-
-### 更新用户信息
-
-只允许更新用户信息中的`scope`、`name`、`location`、`organization`、`postition`、`telephone`、`mobile`、`email`属性
-
-```endpoint
-PATCH /users/{username}
-```
-
-#### 请求示例
-```json
-{
-  "name": "张三",
-  "scope": "private"
-}
-```
-
-#### 响应成功
-```json
-{
-  "username": "jingsam",
-  "scope": "private",
-  "is_verified": false,
-  "name": "张三",
-  "email": "jingsam@163.com",
-  "telephone": "12345678",
-  "organization": "WHU",
-  "createdAt": "2016-05-06T10:18:59.498Z",
-  "updatedAt": "2016-05-06T11:37:35.551Z"
-}
-```
-
-#### 响应失败
-```json
-{
-  "error": "name字段过长"
-}
-```
-
-
 ### 用户登录
 
 用户登录不需要`access_token`，但登录成功后会生成新的`access_token`。
@@ -189,6 +120,94 @@ POST /users/{username}
   "error": "用户名或密码错误"
 }
 ```
+
+
+### 获取用户信息
+
+获取用户信息不会得到`access_token`
+
+```endpoint
+GET /users/{username}
+```
+
+#### 响应成功
+```json
+{
+  "username": "jingsam",
+  "scope": "public",
+  "is_verified": false,
+  "name": "jingsam",
+  "email": "jingsam@163.com",
+  "telephone": "12345678",
+  "organization": "WHU",
+  "createdAt": "2016-05-06T10:18:59.498Z",
+  "updatedAt": "2016-05-06T11:37:35.551Z"
+}
+```
+
+#### 响应失败
+```json
+{
+  "error": "用户不存在"
+}
+```
+
+
+### 更新用户信息
+
+只允许更新用户信息中的`scope`、`name`、`location`、`organization`、`postition`、`telephone`、`mobile`、`email`、`signature`属性
+
+```endpoint
+PATCH /users/{username}
+```
+
+#### 请求示例
+```json
+{
+  "name": "张三",
+  "scope": "private"
+}
+```
+
+#### 响应成功
+```json
+{
+  "username": "jingsam",
+  "scope": "private",
+  "is_verified": false,
+  "name": "张三",
+  "email": "jingsam@163.com",
+  "telephone": "12345678",
+  "organization": "WHU",
+  "createdAt": "2016-05-06T10:18:59.498Z",
+  "updatedAt": "2016-05-06T11:37:35.551Z"
+}
+```
+
+#### 响应失败
+```json
+{
+  "error": "name字段过长"
+}
+```
+
+
+### 更新用户头像
+
+上传的用户头像会自动缩放到100*100px
+
+```endpoint
+PUT /users/{username}/avatar
+```
+
+
+### 获取用户头像
+
+
+```endpoint
+GET /users/{username}/avatar
+```
+
 
 
 ## 地图样式模块
@@ -434,7 +453,7 @@ HTTP 204
 
 ### 获取地图瓦片数据
 
-获取地图样式中的瓦片数据
+获取地图样式的瓦片数据
 
 ```endpoint
 GET /styles/{username}/{style_id}/{z}/{x}/{y}{@2x}.{format}
@@ -446,8 +465,17 @@ GET /styles/{username}/{style_id}/{z}/{x}/{y}{@2x}.{format}
 获取设定范围的地图预览
 
 ```endpoint
-GET /styles/{username}/{style_id}/thumbnail
+GET /styles/{username}/{style_id}/thumbnail?zoom={zoom}&scale={scale}&bbox={bbox}
 ```
+
+参数 | 说明
+--- | ---
+zoom | 缩放级别
+scale | 像素密度级别，以72dpi为基础等比例递增，取值范围[1, 4]
+bbox | 以四至范围设置输出范围，格式为[w, s, e, n]，例如全球范围为[-180,-85.0511,180,85.0511]
+center | 以中心点设置输出范围，格式为{x: 0, y: 0, width: 256, height: 256}
+format | 输出图片的格式，可以是png, jpg
+quality | 输出图片的质量，取值范围为[0, 100]
 
 
 ## 瓦片集模块
@@ -683,14 +711,6 @@ GET /tilesets/{username}/{tileset_id}/{z}/{x}/{y}{@2x}.{format}
 GET /tilesets/{username}/{tileset_id}/raw
 ```
 
-
-### 瓦片集预览
-
-获取设定范围内的瓦片预览
-
-```endpoint
-GET /tilesets/{username}/{tileset_id}/thumbnail
-```
 
 
 ## 字体模块
