@@ -2320,7 +2320,7 @@ HTTP 204
 
 ### 更新数据集信息
 
-可更新的字段有`scope`、`bounds`、`center`。
+可更新的字段有`scope`、`filename`、`tags`。
 
 ```endpoint
 PATCH /datasets/{username}/{dataset_id}
@@ -2342,6 +2342,7 @@ PATCH /datasets/{username}/{dataset_id}
   "filename": "wuhan",
   "format": ".json",
   "filesize": 3774,
+  "tags": [],
   "center": [
     114.4384469476708,
     30.532440455939344
