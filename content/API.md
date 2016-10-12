@@ -975,7 +975,7 @@ GET /fonts/{username}/{fontname}
 
 ### 上传字体
 
-仅支持ttf字体文件的上传
+仅
 
 ```endpoint
 POST /fonts/{username}
