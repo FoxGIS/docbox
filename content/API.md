@@ -760,7 +760,7 @@ HTTP 404
 
 ### 上传数据
 
-上传数据，系统根据上传的数据自动地转换为瓦片数据，支持的格式有`mbtiles`、`geojson`、`shapefile`。
+上传数据，系统根据上传的数据自动地转换为瓦片数据，支持的格式有`mbtiles`、`geojson`、`topojson`、`shapefile`、`tif`。
 
 ```endpoint
 POST /tilesets/{username}
