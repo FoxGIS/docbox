@@ -758,6 +758,47 @@ HTTP 404
 ```
 
 
+### 获取切片状态
+
+获取瓦片集切片时的状态。
+
+```endpoint
+GET /tilesets/{username}/{tileset_id}/status
+```
+
+#### 响应成功
+```json
+{
+  "updatedAt": "2016-05-23T05:51:34.710Z",
+  "createdAt": "2016-05-23T05:51:33.199Z",
+  "owner": "jingsam",
+  "filename": "SD.json",
+  "filesize": 909466,
+  "format": "pbf",
+  "name": "SD",
+  "center": [ 116.3400305, 39.9589555, 10 ],
+  "bounds": [ 116.04142, 39.75872, 116.638641, 40.159191 ],
+  "maxzoom": 11,
+  "minzoom": 5,
+  "data": [],
+  "grids": [],
+  "tiles": [],
+  "scheme": "xyz",
+  "version": "1.0.0",
+  "tilejson": "2.1.0",
+  "tags": [],
+  "vector_layers": [],
+  "scope": "private",
+  "tileset_id": "rJ6P9GlQ"
+}
+```
+
+#### 响应失败
+```json
+HTTP 404
+```
+
+
 ### 上传数据
 
 上传数据，系统根据上传的数据自动地转换为瓦片数据，支持的格式有`mbtiles`、`geojson`、`topojson`、`shapefile`、`tif`。
@@ -1669,17 +1710,11 @@ GET /stats/userdownloads
 #### 响应成功
 ```json
 [{
-  "organization": "foxgis",
-  "location": "beijing",
-  "name": "foxgis",
-  "username": "foxgis",
-  "downloadNum": 12
+  "total": 2113,
+  "organization": "中国地图出版集团"
 },{
-  "organization": "foxgis",
-  "location": "beijing",
-  "name": "jingsam",
-  "username": "jingsam",
-  "downloadNum": 8
+  "total": 1,
+  "organization": "国家基础地理信息中心"
 }]
 ```
 
@@ -1695,15 +1730,19 @@ GET /stats/filedownloads
 #### 响应成功
 ```json
 [{
-  "name": "武汉交通游览图2016",
-  "location": "武汉市",
-  "year": 2015,
-  "downloadNum": 12
+    "location": "海口市海南省",
+    "year": "2016",
+    "owner": "Hainan46",
+    "name": "海口市区图",
+    "downloadNum": 19,
+    "upload_id": "Hyesmkbw"
 },{
-  "name": "辅助决策用图",
-  "location": "北京市",
-  "year": 2016,
-  "downloadNum": 8
+    "location": "湖北省",
+    "year": "2016",
+    "owner": "Hubei42",
+    "name": "武汉交通游览图2016",
+    "downloadNum": 12,
+    "upload_id": "BJ-XLSQ8"
 }]
 ```
 
